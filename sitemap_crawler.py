@@ -1,6 +1,4 @@
-from tracemalloc import start
 from bs4 import BeautifulSoup
-import asyncio
 import requests
 import time
 
@@ -10,13 +8,13 @@ url_broken = 0
 url_redirect = 0
 
 # Temporary set up URL to check
-# url = 'https://www.dryden.se/category-sitemap.xml'
-url = 'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base'
+# input_url = 'https://www.dryden.se/category-sitemap.xml'
+input_url = 'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base'
 
 """ Function for checking url and returning response """
 
 
-async def check_url(url):
+def check_url(url):
     global url_ok, url_broken, url_redirect
     url_status = requests.head(url)
 
@@ -30,19 +28,18 @@ async def check_url(url):
     print(f'{url_status.status_code}: {url}')
 
 # Fetch sitemap.xml and parse it with BS4
-req = requests.get(url)
-sitemap = req.text
-soup = BeautifulSoup(sitemap, features='xml')
 
-# Find all loc tags
-urlList = soup.findAll('loc')
 
-# Iterate result and print urls
-start_time = time.time()
-for url in urlList:
-    asyncio.run(check_url(url.get_text()))
+def fetch_sitemap(url):
+    req = requests.get(url)
+    sitemap = req.text
+    soup = BeautifulSoup(sitemap, features='xml')
 
-print(
-    f'Total number of urls checked {len(urlList)} in {int(time.time() - start_time)} seconds and {url_ok} responded with HTTP 200.')
-print(f'Number of redirects: {url_redirect}')
-print(f'Number of broken urls: {url_broken}')
+    # Find all loc tags
+    return soup.findAll('loc')
+
+
+if __name__ == '__main__':
+    urlList = fetch_sitemap(input_url)
+    print(
+        f'Total number of urls in sitemap {len(urlList)}.')
