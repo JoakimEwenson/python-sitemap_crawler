@@ -101,9 +101,6 @@ if __name__ == '__main__':
         for link in sitemap:
             print(f'\nCrawling links in {link.get_text()}')
             fetch_hyperlinks(link.get_text())
-        # Time well spent
-        print(
-            f'\nTotal execution time is {int(time.time() - start_time)} seconds')
         print('Broken URLs:')
         # for item in url_redirect:
         #     print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
@@ -128,3 +125,6 @@ if __name__ == '__main__':
             for item in url_server_err:
                 file.write(
                     f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+        # Time well spent
+        print(
+            f'\nTotal execution time is {int(time.time() - start_time)} seconds')
