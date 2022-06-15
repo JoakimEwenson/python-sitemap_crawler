@@ -25,8 +25,11 @@ headers = {
     'User-Agent': '404 crawler by Joakim Ewenson'
 }
 
-# Initiate empty counter
+# Initiate empty counter for OK
 url_ok = 0
+# Initiate empty set for storing URLs
+url_list = set()
+# Initiate empty arrays for results
 url_broken = []
 url_redirect = []
 url_server_err = []
@@ -37,29 +40,34 @@ url_unknown_err = []
 
 def check_url(origin: str, url: str):
     if validators.url(url):
-        global url_ok, url_broken, url_redirect
-        try:
-            # TODO: Check list of already verified URLs first, only call if not found
-            response = requests.head(url, headers=headers)
+        global url_list, url_ok, url_broken, url_redirect
+        # Check list of already verified URLs first, only call if not found
+        if url not in url_list:
+            # Add url to set for later
+            url_list.add(url)
+            try:
+                # Call for HEAD response with 15s timeout
+                response = requests.head(url, headers=headers, timeout=15)
 
-            print(f'HTTP {response.status_code} for {url}')
+                print(f'HTTP {response.status_code} for {url}')
 
-            if response.status_code >= 200 and response.status_code <= 299:
-                url_ok += 1
+                if response.status_code >= 200 and response.status_code <= 299:
+                    url_ok += 1
 
-            if response.status_code >= 300 and response.status_code <= 399:
-                url_redirect.append(
-                    UrlObject(origin=origin, url=url, status=response.status_code))
+                if response.status_code >= 300 and response.status_code <= 399:
+                    url_redirect.append(
+                        UrlObject(origin=origin, url=url, status=response.status_code))
 
-            if response.status_code >= 400 and response.status_code <= 499:
-                url_broken.append(
-                    UrlObject(origin=origin, url=url, status=response.status_code))
+                if response.status_code >= 400 and response.status_code <= 499:
+                    url_broken.append(
+                        UrlObject(origin=origin, url=url, status=response.status_code))
 
-            if response.status_code >= 500 and response.status_code <= 599:
-                url_server_err.append(
-                    UrlObject(origin=origin, url=url, status=response.status_code))
-        except:
-            url_unknown_err.append(UrlObject(origin=origin, url=url, status=999))
+                if response.status_code >= 500 and response.status_code <= 599:
+                    url_server_err.append(
+                        UrlObject(origin=origin, url=url, status=response.status_code))
+            except:
+                url_unknown_err.append(
+                    UrlObject(origin=origin, url=url, status=999))
 
 
 """ Fetch hyperlinks from page """
@@ -85,20 +93,38 @@ if __name__ == '__main__':
         # Starting timer
         start_time = time.time()
         # Fetch sitemap
-        # sitemap = fetch_sitemap(f'{base_url}/sitemap.xml')
-        sitemap = fetch_sitemap(f'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base')
+        sitemap = fetch_sitemap(f'{base_url}')
+        # sitemap = fetch_sitemap(f'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base')
         print(f'Sitemap contains {len(sitemap)} urls to crawl')
         # Fetching links
-        #fetch_hyperlinks(sys.argv[1])
+        # fetch_hyperlinks(sys.argv[1])
         for link in sitemap:
+            print(f'\nCrawling links in {link.get_text()}')
             fetch_hyperlinks(link.get_text())
         # Time well spent
         print(
-            f'Total execution time is {int(time.time() - start_time)} seconds')
+            f'\nTotal execution time is {int(time.time() - start_time)} seconds')
         print('Broken URLs:')
-        for item in url_redirect:
-            print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+        # for item in url_redirect:
+        #     print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+        print('\n4xx responses\n')
         for item in url_broken:
             print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+        print('\n5xx responses\n')
         for item in url_server_err:
             print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+        # Print to log file
+        with open(f'url_test_{int(time.time())}.log', 'w') as file:
+            file.write('Broken URLs:\n')
+            file.write('\n3xx responses\n')
+            for item in url_redirect:
+                file.write(
+                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            file.write('\n4xx responses\n')
+            for item in url_broken:
+                file.write(
+                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            file.write('\n5xx responses:\n')
+            for item in url_server_err:
+                file.write(
+                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
