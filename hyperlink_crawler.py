@@ -93,7 +93,6 @@ if __name__ == '__main__':
         start_time = time.time()
         # Fetch sitemap
         sitemap = fetch_sitemap(f'{base_url}')
-        # sitemap = fetch_sitemap(f'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base')
         print(f'Sitemap contains {len(sitemap)} urls to crawl')
         # Fetching links
         # fetch_hyperlinks(sys.argv[1])

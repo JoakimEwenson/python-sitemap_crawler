@@ -1,13 +1,12 @@
+import sys
 from bs4 import BeautifulSoup
 import requests
+import validators
 
 # Initiate empty counter
 url_ok = 0
 url_broken = 0
 url_redirect = 0
-
-# Temporary set up URL to check
-input_url = 'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base'
 
 """ Function for checking url and returning response """
 
@@ -38,6 +37,11 @@ def fetch_sitemap(url):
 
 
 if __name__ == '__main__':
-    urlList = fetch_sitemap(input_url)
-    print(
-        f'Total number of urls in sitemap {len(urlList)}.')
+    if len(sys.argv) == 1:
+        print('Please supply a URL as input string on the next attempt.')
+        exit()
+    if validators.url(sys.argv[1]):
+        base_url = sys.argv[1]
+        urlList = fetch_sitemap(base_url)
+        print(
+            f'Total number of urls in sitemap {len(urlList)}.')
