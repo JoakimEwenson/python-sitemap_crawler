@@ -1,4 +1,3 @@
-from os import EX_CANTCREAT
 from bs4 import BeautifulSoup
 from sitemap_crawler import fetch_sitemap
 import requests
