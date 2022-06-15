@@ -11,6 +11,6 @@ Have you ever come across a 404 link on some blog? Maybee want to verify that al
 
 ## What it does
 1. The file reads sitemap.xml and collect all `<loc>` elements and the link inside. 
-2. Then it reads that file content, try to find all `<a href="">` tags and fetch the url inside. 
-3. After this, it will verify that it is a valid URL and make a HEAD-request for that URL.
+2. Then it reads that file content, try to find all `<a href="">` tags and fetch the URL inside. 
+3. After this, it will verify that it is a valid URL and make a HEAD-request for that URL. At the same time, it will also save that URL in memory to make sure that unique URLs don't get multiple requests.
 4. It will then get the HTTP status code from that request and save those with a 3xx, 4xx or 5xx responses for displaying and log output later.
