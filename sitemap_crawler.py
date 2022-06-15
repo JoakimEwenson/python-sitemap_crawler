@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import time
 
 # Initiate empty counter
 url_ok = 0
@@ -8,7 +7,6 @@ url_broken = 0
 url_redirect = 0
 
 # Temporary set up URL to check
-# input_url = 'https://www.dryden.se/category-sitemap.xml'
 input_url = 'http://10.0.1.10/projekt/wpdemo/?tsf-sitemap=base'
 
 """ Function for checking url and returning response """
