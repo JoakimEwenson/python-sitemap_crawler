@@ -1,3 +1,4 @@
+import enum
 from bs4 import BeautifulSoup
 from sitemap_crawler import fetch_sitemap
 import requests
@@ -78,8 +79,10 @@ def fetch_hyperlinks(url: str):
     if response.status_code == 200:
         content = response.text
         soup = BeautifulSoup(content, 'html.parser')
-        for link in soup.find_all('a', href=True):
-            check_url(url, link['href'])
+        for item in soup.find_all('a', href=True):
+            # Remove # from end of url string
+            link = item['href'].rsplit('#')
+            check_url(url, link[0])
 
 
 """ Execute function if run as stand alone """
@@ -96,8 +99,8 @@ if __name__ == '__main__':
         print(f'Sitemap contains {len(sitemap)} urls to crawl')
         # Fetching links
         # fetch_hyperlinks(sys.argv[1])
-        for link in sitemap:
-            print(f'\nCrawling links in {link.get_text()}')
+        for index, link in enumerate(sitemap):
+            print(f'\nCrawling links in {link.get_text()} (link {index + 1}/{len(sitemap)})')
             fetch_hyperlinks(link.get_text())
         print('Broken URLs:')
         # for item in url_redirect:
