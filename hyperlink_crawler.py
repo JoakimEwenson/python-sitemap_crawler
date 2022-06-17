@@ -77,6 +77,14 @@ def fetch_hyperlinks(url: str):
     try:
         response = requests.get(url, headers=headers)
 
+        if response.status_code == 200:
+            content = response.text
+            soup = BeautifulSoup(content, 'html.parser')
+            for link in soup.find_all('a', href=True):
+                check_url(url, link['href'])
+    except:
+        pass
+
 
 
 
@@ -130,6 +138,9 @@ if __name__ == '__main__':
                 for item in url_server_err:
                     file.write(
                         f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            # Time well spent
+            file.write(
+                f'\nTotal execution time is {int(time.time() - start_time)} seconds')
         # Time well spent
         print(
             f'\nTotal execution time is {int(time.time() - start_time)} seconds')
