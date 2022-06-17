@@ -73,13 +73,16 @@ def check_url(origin: str, url: str):
 
 
 def fetch_hyperlinks(url: str):
-    response = requests.get(url, headers=headers)
+    try:
+        response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
-        content = response.text
-        soup = BeautifulSoup(content, 'html.parser')
-        for link in soup.find_all('a', href=True):
-            check_url(url, link['href'])
+        if response.status_code == 200:
+            content = response.text
+            soup = BeautifulSoup(content, 'html.parser')
+            for link in soup.find_all('a', href=True):
+                check_url(url, link['href'])
+    except:
+        pass
 
 
 """ Execute function if run as stand alone """
@@ -99,30 +102,39 @@ if __name__ == '__main__':
         for link in sitemap:
             print(f'\nCrawling links in {link.get_text()}')
             fetch_hyperlinks(link.get_text())
-        print('Broken URLs:')
-        # for item in url_redirect:
-        #     print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
-        print('\n4xx responses\n')
-        for item in url_broken:
-            print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
-        print('\n5xx responses\n')
-        for item in url_server_err:
-            print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+        
+        # Check if there are any values in the broken and server_err arrays
+        if len(url_broken) > 0 or len(url_server_err) > 0:
+            print('Broken URLs:')
+            # for item in url_redirect:
+            #     print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+            if len(url_broken) > 0:
+                print('\n4xx responses\n')
+                for item in url_broken:
+                    print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+            if len(url_server_err) > 0:
+                print('\n5xx responses\n')
+                for item in url_server_err:
+                    print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+                    
         # Print to log file
         with open(f'url_test_{int(time.time())}.log', 'w') as file:
             file.write('Broken URLs:\n')
-            file.write('\n3xx responses\n')
-            for item in url_redirect:
-                file.write(
-                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
-            file.write('\n4xx responses\n')
-            for item in url_broken:
-                file.write(
-                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
-            file.write('\n5xx responses:\n')
-            for item in url_server_err:
-                file.write(
-                    f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            if len(url_redirect) > 0:
+                file.write('\n3xx responses\n')
+                for item in url_redirect:
+                    file.write(
+                        f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            if len(url_broken) > 0:
+                file.write('\n4xx responses\n')
+                for item in url_broken:
+                    file.write(
+                        f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
+            if len(url_server_err) > 0:
+                file.write('\n5xx responses:\n')
+                for item in url_server_err:
+                    file.write(
+                        f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
         # Time well spent
         print(
             f'\nTotal execution time is {int(time.time() - start_time)} seconds')
