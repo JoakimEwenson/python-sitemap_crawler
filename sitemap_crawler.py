@@ -42,6 +42,6 @@ if __name__ == '__main__':
         exit()
     if validators.url(sys.argv[1]):
         base_url = sys.argv[1]
-        urlList = fetch_sitemap(base_url)
+        url_list = fetch_sitemap(base_url)
         print(
-            f'Total number of urls in sitemap {len(urlList)}.')
+            f'Total number of urls in sitemap {len(url_list)}.')
