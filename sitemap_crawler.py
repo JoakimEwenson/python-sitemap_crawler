@@ -8,10 +8,9 @@ url_ok = 0
 url_broken = 0
 url_redirect = 0
 
-""" Function for checking url and returning response """
-
 
 def check_url(url):
+    """ Function for checking url and returning response """
     global url_ok, url_broken, url_redirect
     url_status = requests.head(url)
 
@@ -24,10 +23,9 @@ def check_url(url):
 
     print(f'{url_status.status_code}: {url}')
 
-# Fetch sitemap.xml and parse it with BS4
-
 
 def fetch_sitemap(url):
+    """ Fetch sitemap.xml and parse it with BS4 """
     req = requests.get(url)
     sitemap = req.text
     soup = BeautifulSoup(sitemap, features='xml')

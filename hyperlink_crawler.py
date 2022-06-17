@@ -6,10 +6,9 @@ import sys
 import time
 import validators
 
-""" Set up a url object """
-
 
 class UrlObject:
+    """ Set up a url object """
     origin: str
     url: str
     status: int
@@ -35,10 +34,9 @@ url_redirect = []
 url_server_err = []
 url_unknown_err = []
 
-""" Validate URL response status """
-
 
 def check_url(origin: str, url: str):
+    """ Validate URL response status """
     if validators.url(url):
         global url_list, url_ok, url_broken, url_redirect
         # Check list of already verified URLs first, only call if not found
@@ -70,10 +68,8 @@ def check_url(origin: str, url: str):
                     UrlObject(origin=origin, url=url, status=999))
 
 
-""" Fetch hyperlinks from page """
-
-
 def fetch_hyperlinks(url: str):
+    """ Fetch hyperlinks from page """
     try:
         response = requests.get(url, headers=headers)
 
@@ -86,10 +82,8 @@ def fetch_hyperlinks(url: str):
         pass
 
 
-
-
-""" Execute function if run as stand alone """
 if __name__ == '__main__':
+    """ Execute function if run as stand alone """
     if len(sys.argv) == 1:
         print('Please supply a URL as input string on the next attempt.')
         exit()
@@ -103,9 +97,10 @@ if __name__ == '__main__':
         # Fetching links
         # fetch_hyperlinks(sys.argv[1])
         for index, link in enumerate(sitemap):
-            print(f'\nCrawling links in {link.get_text()} (link {index + 1}/{len(sitemap)})')
+            print(
+                f'\nCrawling links in {link.get_text()} (link {index + 1}/{len(sitemap)})')
             fetch_hyperlinks(link.get_text())
-        
+
         # Check if there are any values in the broken and server_err arrays
         if len(url_broken) > 0 or len(url_server_err) > 0:
             print('Broken URLs:')
@@ -114,12 +109,14 @@ if __name__ == '__main__':
             if len(url_broken) > 0:
                 print('\n4xx responses\n')
                 for item in url_broken:
-                    print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
+                    print(
+                        f'HTTP {item.status}: {item.url} with origin {item.origin}')
             if len(url_server_err) > 0:
                 print('\n5xx responses\n')
                 for item in url_server_err:
-                    print(f'HTTP {item.status}: {item.url} with origin {item.origin}')
-                    
+                    print(
+                        f'HTTP {item.status}: {item.url} with origin {item.origin}')
+
         # Print to log file
         with open(f'url_test_{int(time.time())}.log', 'w') as file:
             file.write('Broken URLs:\n')
