@@ -85,6 +85,7 @@ def fetch_hyperlinks(url: str):
             # for link in soup.find_all('a', href=True):
             #     # check_url(url, link['href'])
                 # check_url(link['href'])
+            # Threaded solution
             url_list = []
             for link in soup.find_all('a', href=True):
                 url_list.append(link['href'])
@@ -107,7 +108,6 @@ if __name__ == '__main__':
         sitemap = fetch_sitemap(f'{base_url}')
         print(f'Sitemap contains {len(sitemap)} urls to crawl')
         # Fetching links
-        # fetch_hyperlinks(sys.argv[1])
         for index, link in enumerate(sitemap):
             print(
                 f'\nCrawling links in {link.get_text()} (link {index + 1}/{len(sitemap)})')
