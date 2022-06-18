@@ -1,6 +1,6 @@
-import enum
 from bs4 import BeautifulSoup
 from sitemap_crawler import fetch_sitemap
+import concurrent.futures
 import requests
 import sys
 import time
@@ -35,12 +35,17 @@ url_server_err = []
 url_unknown_err = []
 
 
-def check_url(origin: str, url: str):
+def check_url(url: str):
     """ Validate URL response status """
+    origin = 'https://example.com'
     if validators.url(url):
         global url_list, url_ok, url_broken, url_redirect
         # Check list of already verified URLs first, only call if not found
         if url not in url_list:
+            # Remove # from url
+            url = url.rsplit('#')[0]
+            # Remove & from url
+            url = url.rsplit('&')[0]
             # Add url to set for later
             url_list.add(url)
             try:
@@ -76,8 +81,15 @@ def fetch_hyperlinks(url: str):
         if response.status_code == 200:
             content = response.text
             soup = BeautifulSoup(content, 'html.parser')
+            # Working solution without threads
+            # for link in soup.find_all('a', href=True):
+            #     # check_url(url, link['href'])
+                # check_url(link['href'])
+            url_list = []
             for link in soup.find_all('a', href=True):
-                check_url(url, link['href'])
+                url_list.append(link['href'])
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.map(check_url, url_list)
     except:
         pass
 
@@ -137,7 +149,7 @@ if __name__ == '__main__':
                         f'HTTP {item.status}: {item.url} with origin {item.origin}\n')
             # Time well spent
             file.write(
-                f'\nTotal execution time is {int(time.time() - start_time)} seconds')
+                f'\nTotal execution time was {int(time.time() - start_time)} seconds')
         # Time well spent
         print(
-            f'\nTotal execution time is {int(time.time() - start_time)} seconds')
+            f'\nTotal execution time was {int(time.time() - start_time)} seconds')

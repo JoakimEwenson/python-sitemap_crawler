@@ -9,11 +9,11 @@ from parsers import parse_htmlpage, parse_sitemap, verify_hyperlinks
 
 
 if __name__ == '__main__':
+    if validators.url(sys.argv[1]):
+        base_url = sys.argv[1]
     if len(sys.argv) == 1:
         base_url = input('Please supply a URL: ')
 
-    # if validators.url(sys.argv[1]):
-    #     base_url = sys.argv[1]
 
     if validators.url(base_url):
         start_time = time.time()
