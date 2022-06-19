@@ -24,6 +24,8 @@ headers = {
     'User-Agent': '404 crawler by Joakim Ewenson'
 }
 
+# Initiate empty counter for total amount of links checked
+url_total = 0
 # Initiate empty counter for OK
 url_ok = 0
 # Initiate empty set for storing URLs
@@ -39,14 +41,15 @@ def check_url(url: str):
     """ Validate URL response status """
     origin = 'https://example.com'
     if validators.url(url):
-        global url_list, url_ok, url_broken, url_redirect
+        global url_list, url_ok, url_broken, url_redirect, url_total
         # Check list of already verified URLs first, only call if not found
+        # Remove # from url
+        url = url.rsplit('#')[0]
+        # Remove & from url
+        url = url.rsplit('&')[0]
         if url not in url_list:
-            # Remove # from url
-            url = url.rsplit('#')[0]
-            # Remove & from url
-            url = url.rsplit('&')[0]
             # Add url to set for later
+            url_total += 1
             url_list.add(url)
             try:
                 # Call for HEAD response with 15s timeout
@@ -152,4 +155,4 @@ if __name__ == '__main__':
                 f'\nTotal execution time was {int(time.time() - start_time)} seconds')
         # Time well spent
         print(
-            f'\nTotal execution time was {int(time.time() - start_time)} seconds')
+            f'\nTotal execution time was {int(time.time() - start_time)} seconds and a total of {url_total} links where checked.')
